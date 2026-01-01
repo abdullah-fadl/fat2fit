@@ -6,278 +6,262 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 // الموظفات والمدربات
 model User {
-  id          String   @id @default(uuid())
-  name        String
-  email       String?  @unique
-  phone       String?  @unique
-  password    String
-  role        String @default("RECEPTION")
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id        String   @id @default(uuid())
+  name      String
+  email     String?  @unique
+  phone     String?  @unique
+  password  String
+  role      String   @default("RECEPTION")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  auditLogs   AuditLog[]
-  checkIns    CheckIn[]
-  invoices    Invoice[]
-  
+  auditLogs AuditLog[]
+  checkIns  CheckIn[]
+  invoices  Invoice[]
+
   @@map("users")
 }
 
-
-
 // العميلات
 model Client {
-  id                String    @id @default(uuid())
-  membershipNumber  String    @unique // رقم العضوية
-  name              String
-  phone             String    @unique
-  email             String?
-  dateOfBirth       DateTime?
-  height            Float?    // الطول بالسم
-  weight            Float?    // الوزن بالكيلو
-  healthStatus      String?   // حالة صحية
-  notes             String?   // ملاحظات
-  image             String?   // رابط الصورة
-  referredBy        String?   // جهة معرفة
-  qrCode            String?   @unique // QR Code للعضوية
-  barcode           String?   @unique // Barcode
-  fingerprintId     String?   // معرف البصمة في جهاز ZKTeco
-  
+  id               String    @id @default(uuid())
+  membershipNumber String    @unique // رقم العضوية
+  name             String
+  phone            String    @unique
+  email            String?
+  dateOfBirth      DateTime?
+  height           Float? // الطول بالسم
+  weight           Float? // الوزن بالكيلو
+  healthStatus     String? // حالة صحية
+  notes            String? // ملاحظات
+  image            String? // رابط الصورة
+  referredBy       String? // جهة معرفة
+  qrCode           String?   @unique // QR Code للعضوية
+  barcode          String?   @unique // Barcode
+  fingerprintId    String? // معرف البصمة في جهاز ZKTeco
+
   // Status
-  status            String @default("ACTIVE")
-  totalDebt         Float     @default(0) // إجمالي المديونية
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
+  status    String @default("ACTIVE")
+  totalDebt Float  @default(0) // إجمالي المديونية
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  subscriptions     Subscription[]
-  payments          Payment[]
-  invoices          Invoice[]
-  checkIns          CheckIn[]
-  clientNotes       ClientNote[]
-  
+  subscriptions Subscription[]
+  payments      Payment[]
+  invoices      Invoice[]
+  checkIns      CheckIn[]
+  clientNotes   ClientNote[]
+
   @@map("clients")
 }
 
-
-
 // الباقات والاشتراكات
 model SubscriptionPackage {
-  id            String    @id @default(uuid())
-  name          String    // اسم الباقة (شهري، ربع سنوي، سنوي)
-  nameAr        String    // الاسم بالعربي
-  type          String
-  duration      Int       // المدة بالأيام
-  price         Float     // السعر
-  visits        Int?      // عدد الزيارات (إن وجد)
-  isVIP         Boolean   @default(false)
-  isActive      Boolean   @default(true)
-  description   String?
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id          String  @id @default(uuid())
+  name        String // اسم الباقة (شهري، ربع سنوي، سنوي)
+  nameAr      String // الاسم بالعربي
+  type        String
+  duration    Int // المدة بالأيام
+  price       Float // السعر
+  visits      Int? // عدد الزيارات (إن وجد)
+  isVIP       Boolean @default(false)
+  isActive    Boolean @default(true)
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
   subscriptions Subscription[]
-  
+
   @@map("subscription_packages")
 }
 
-
-
 // الاشتراكات
 model Subscription {
-  id                  String            @id @default(uuid())
-  clientId            String
-  packageId           String
-  startDate           DateTime
-  endDate             DateTime
-  originalEndDate     DateTime          // تاريخ الانتهاء الأصلي قبل التجميد
-  
-  status              String @default("ACTIVE")
-  totalPrice          Float
-  discountAmount      Float     @default(0) // قيمة الخصم
-  discountPercent     Float?    // نسبة الخصم
-  finalPrice          Float
-  
+  id              String   @id @default(uuid())
+  clientId        String
+  packageId       String
+  startDate       DateTime
+  endDate         DateTime
+  originalEndDate DateTime // تاريخ الانتهاء الأصلي قبل التجميد
+
+  status          String @default("ACTIVE")
+  totalPrice      Float
+  discountAmount  Float  @default(0) // قيمة الخصم
+  discountPercent Float? // نسبة الخصم
+  finalPrice      Float
+
   // تجميد الاشتراك
-  isFrozen            Boolean   @default(false)
-  frozenReason        String?
-  frozenStartDate     DateTime?
-  frozenEndDate       DateTime?
-  frozenDays          Int       @default(0) // عدد أيام التجميد
-  
+  isFrozen        Boolean   @default(false)
+  frozenReason    String?
+  frozenStartDate DateTime?
+  frozenEndDate   DateTime?
+  frozenDays      Int       @default(0) // عدد أيام التجميد
+
   // تجديد تلقائي
-  autoRenew           Boolean   @default(false)
-  
+  autoRenew Boolean @default(false)
+
   // ملاحظات
-  notes               String?
-  
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  client              Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  package             SubscriptionPackage @relation(fields: [packageId], references: [id])
-  payments            Payment[]
-  invoices            Invoice[]
-  
+  client   Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  package  SubscriptionPackage @relation(fields: [packageId], references: [id])
+  payments Payment[]
+  invoices Invoice[]
+
   @@map("subscriptions")
 }
 
-
-
 // المدفوعات
 model Payment {
-  id              String        @id @default(uuid())
-  clientId        String
-  subscriptionId  String?
-  invoiceId       String?
-  
+  id             String  @id @default(uuid())
+  clientId       String
+  subscriptionId String?
+  invoiceId      String?
+
   amount          Float
   paymentMethod   String
-  paymentDate     DateTime      @default(now())
-  referenceNumber String?       // رقم المرجع
+  paymentDate     DateTime @default(now())
+  referenceNumber String? // رقم المرجع
   notes           String?
-  
+
   // للمدفوعات الجزئية
-  isPartial       Boolean       @default(false)
-  remainingAmount Float?        // المبلغ المتبقي
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
+  isPartial       Boolean @default(false)
+  remainingAmount Float? // المبلغ المتبقي
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  subscription    Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  invoice         Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
-  
+  client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  invoice      Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
   @@map("payments")
 }
 
-
-
 // الفواتير
 model Invoice {
-  id              String        @id @default(uuid())
-  invoiceNumber   String        @unique // رقم الفاتورة
-  clientId        String
-  subscriptionId  String?
-  userId          String        // الموظف الذي أصدر الفاتورة
-  
-  subtotal        Float
-  discountAmount  Float         @default(0)
-  taxAmount       Float         @default(0)
-  total           Float
-  
-  status          String @default("PENDING")
-  
+  id             String  @id @default(uuid())
+  invoiceNumber  String  @unique // رقم الفاتورة
+  clientId       String
+  subscriptionId String?
+  userId         String // الموظف الذي أصدر الفاتورة
+
+  subtotal       Float
+  discountAmount Float @default(0)
+  taxAmount      Float @default(0)
+  total          Float
+
+  status String @default("PENDING")
+
   // معلومات إضافية
-  notes           String?
-  couponCode      String?
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  paidAt          DateTime?
-  
+  notes      String?
+  couponCode String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  paidAt    DateTime?
+
   // Relations
-  client          Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  subscription    Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  user            User          @relation(fields: [userId], references: [id])
-  payments        Payment[]
-  
+  client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id])
+  payments     Payment[]
+
   @@map("invoices")
 }
 
-
-
 // سجل الدخول والحضور
 model CheckIn {
-  id            String    @id @default(uuid())
+  id            String   @id @default(uuid())
   clientId      String
-  userId        String?   // الموظف الذي سجل الدخول
-  checkInDate   DateTime  @default(now())
+  userId        String? // الموظف الذي سجل الدخول
+  checkInDate   DateTime @default(now())
   method        String // طريقة الدخول (QR, Barcode, Phone, Fingerprint)
-  fingerprintId String?   // معرف البصمة إذا كانت طريقة الدخول بالبصمة
-  
+  fingerprintId String? // معرف البصمة إذا كانت طريقة الدخول بالبصمة
+
   // Relations
-  client        Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  @@map("check_ins")
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   @@index([clientId, checkInDate])
+  @@map("check_ins")
 }
-
-
 
 // الكوبونات والعروض
 model Coupon {
-  id              String        @id @default(uuid())
-  code            String        @unique // كود الكوبون
-  name            String
-  description     String?
-  
-  discountType    String
-  discountValue   Float         // قيمة أو نسبة الخصم
-  minPurchase     Float?        // الحد الأدنى للشراء
-  maxDiscount     Float?        // أقصى خصم
-  
-  validFrom       DateTime
-  validUntil      DateTime
-  maxUses         Int?          // الحد الأقصى لعدد الاستخدامات
-  currentUses     Int           @default(0)
-  
-  isActive        Boolean       @default(true)
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
+  id          String  @id @default(uuid())
+  code        String  @unique // كود الكوبون
+  name        String
+  description String?
+
+  discountType  String
+  discountValue Float // قيمة أو نسبة الخصم
+  minPurchase   Float? // الحد الأدنى للشراء
+  maxDiscount   Float? // أقصى خصم
+
+  validFrom   DateTime
+  validUntil  DateTime
+  maxUses     Int? // الحد الأقصى لعدد الاستخدامات
+  currentUses Int      @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("coupons")
 }
 
-
-
 // ملاحظات العميلة
 model ClientNote {
-  id          String    @id @default(uuid())
-  clientId    String
-  note        String
-  createdBy   String?   // اسم الموظف
-  createdAt   DateTime  @default(now())
-  
+  id        String   @id @default(uuid())
+  clientId  String
+  note      String
+  createdBy String? // اسم الموظف
+  createdAt DateTime @default(now())
+
   // Relations
-  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
   @@map("client_notes")
 }
 
 // سجل التدقيق (Audit Log)
 model AuditLog {
-  id          String    @id @default(uuid())
+  id          String  @id @default(uuid())
   userId      String
-  action      String    // العملية (create, update, delete)
-  entityType  String    // نوع الكيان (Client, Subscription, etc.)
-  entityId    String    // معرف الكيان
-  oldValue    String?   // القيمة القديمة (JSON)
-  newValue    String?   // القيمة الجديدة (JSON)
+  action      String // العملية (create, update, delete)
+  entityType  String // نوع الكيان (Client, Subscription, etc.)
+  entityId    String // معرف الكيان
+  oldValue    String? // القيمة القديمة (JSON)
+  newValue    String? // القيمة الجديدة (JSON)
   description String?
   ipAddress   String?
-  
-  createdAt   DateTime  @default(now())
-  
+
+  createdAt DateTime @default(now())
+
   // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@map("audit_logs")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, createdAt])
+  @@map("audit_logs")
 }
 
 // أجهزة البصمة ZKTeco
@@ -290,25 +274,25 @@ model ZKDevice {
   description String?
   isActive    Boolean   @default(true)
   lastSync    DateTime?
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("zk_devices")
 }
 
 // إعدادات Odoo
 model OdooSettings {
-  id          String    @id @default(uuid())
-  url         String
-  database    String
-  username    String
-  apiKey      String    // API Key للمصادقة
-  isActive    Boolean   @default(true)
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  id       String  @id @default(uuid())
+  url      String
+  database String
+  username String
+  apiKey   String // API Key للمصادقة
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([url, database])
   @@map("odoo_settings")
 }

@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "next dev -p 80",
     "dev:sudo": "sudo next dev -p 80",
-    "build": "next build",
+    "postinstall": "prisma generate",
+    "build": "prisma generate && (prisma migrate deploy || prisma db push --accept-data-loss) && next build",
     "start": "next start -p 80",
     "start:sudo": "sudo next start -p 80",
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio"
   },
   "dependencies": {

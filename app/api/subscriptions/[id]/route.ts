@@ -55,14 +55,14 @@ export async function PUT(
     const { action, frozenReason, frozenDays, frozenEndDate } = body
 
     // Check permissions based on action
-    let requiredPermission = PERMISSIONS.SUBSCRIPTIONS_VIEW
+    let requiredPermission: string = PERMISSIONS.SUBSCRIPTIONS_VIEW
     if (action === "freeze" || action === "unfreeze") {
       requiredPermission = PERMISSIONS.SUBSCRIPTIONS_FREEZE
     } else if (action === "renew" || action === "upgrade") {
       requiredPermission = PERMISSIONS.SUBSCRIPTIONS_RENEW
     }
 
-    const permCheck = await requirePermission(requiredPermission)
+    const permCheck = await requirePermission(requiredPermission as any)
     if (permCheck.error) {
       return permCheck.response
     }
@@ -72,9 +72,14 @@ export async function PUT(
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
+    const userId = (session.user as any)?.id || ""
+
     const subscription = await prisma.subscription.findUnique({
       where: { id: resolvedParams.id },
-      include: { client: true },
+      include: { 
+        client: true,
+        package: true,
+      },
     })
 
     if (!subscription) {
@@ -144,7 +149,6 @@ export async function PUT(
       })
 
       // إنشاء سجل تدقيق
-      const userId = (session.user as any)?.id || ""
       logUpdate(
         userId,
         "Subscription",

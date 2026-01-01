@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
             id: true,
             name: true,
             membershipNumber: true,
-            odooPartnerId: true,
+            // odooPartnerId not in schema
           },
         },
         subscription: {
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         invoice: {
           select: {
             id: true,
-            odooInvoiceId: true,
+            // odooInvoiceId not in schema
           },
         },
       },
@@ -137,16 +137,18 @@ export async function POST(req: NextRequest) {
       `تم تسجيل دفعة: ${amount} ريال للعميلة ${client.name}`
     ).catch((error) => console.error("Error creating audit log:", error))
 
-    // مزامنة مع Odoo إذا كانت مفعلة
+    // مزامنة مع Odoo إذا كانت مفعلة (معطلة مؤقتاً - Odoo fields غير موجودة في schema)
+    /*
     try {
       const { getOdooClient } = await import("@/lib/odoo")
       const odooSettings = await prisma.odooSettings.findFirst({
-        where: { isActive: true, syncPayments: true },
+        where: { isActive: true },
+        // syncPayments field not in schema
       })
 
       if (odooSettings && payment.invoice?.id) {
-        const odooClient = await getOdooClient()
-        if (odooClient && payment.client) {
+        const { client: odooClient, error: odooError } = await getOdooClient()
+        if (odooClient && !odooError && payment.client) {
           // التأكد من وجود العميل في Odoo
           let partnerId = payment.client.odooPartnerId
           if (!partnerId) {
@@ -199,14 +201,15 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
       console.error("Error syncing payment with Odoo:", error)
       // تحديث الحالة بالفشل ولكن لا نمنع إنشاء الدفعة
-      await prisma.payment.update({
-        where: { id: payment.id },
-        data: {
-          odooSyncStatus: "FAILED",
-          odooSyncedAt: new Date(),
-        },
-      })
+      // await prisma.payment.update({
+      //   where: { id: payment.id },
+      //   data: {
+      //     odooSyncStatus: "FAILED",
+      //     odooSyncedAt: new Date(),
+      //   },
+      // })
     }
+    */
 
     return NextResponse.json(payment, { status: 201 })
   } catch (error) {

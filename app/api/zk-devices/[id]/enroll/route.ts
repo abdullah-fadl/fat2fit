@@ -65,19 +65,22 @@ export async function POST(
       // توليد رقم بصمة فريد (يمكن استخدام رقم عضوية أو ID)
       let fingerprintId = client.fingerprintId
       
+      let fingerprintNum: number
       if (!fingerprintId) {
         // استخدام رقم عضوية كرقم بصمة
         const membershipNum = parseInt(client.membershipNumber.replace("MEM", ""))
-        fingerprintId = 1000 + membershipNum // بداية من 1000
+        fingerprintNum = 1000 + membershipNum // بداية من 1000
+      } else {
+        fingerprintNum = parseInt(fingerprintId) || 0
       }
 
       // إضافة المستخدم للجهاز
-      await zkDevice.setUser(fingerprintId, client.name, 0)
+      await zkDevice.setUser(fingerprintNum, client.name, 0)
 
       // تحديث العميلة برقم البصمة
       await prisma.client.update({
         where: { id: client.id },
-        data: { fingerprintId },
+        data: { fingerprintId: fingerprintNum.toString() },
       })
 
       zkDevice.disconnect()

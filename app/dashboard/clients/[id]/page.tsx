@@ -21,6 +21,7 @@ interface Client {
   image: string | null
   status: string
   totalDebt: number
+  referredBy?: string | null
   subscriptions: Array<{
     id: string
     startDate: Date
@@ -74,6 +75,7 @@ export default function ClientDetailPage() {
   const [zkDevices, setZkDevices] = useState<Array<{ id: string; name: string }>>([])
   const [showEnrollModal, setShowEnrollModal] = useState(false)
   const [selectedDevice, setSelectedDevice] = useState("")
+  const [enrollMessage, setEnrollMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
   const dateOfBirthInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {

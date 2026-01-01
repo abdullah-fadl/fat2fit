@@ -310,12 +310,13 @@ export async function POST(req: NextRequest) {
     try {
       const { getOdooClient } = await import("@/lib/odoo")
       const odooSettings = await prisma.odooSettings.findFirst({
-        where: { isActive: true, syncInvoices: true },
+        where: { isActive: true },
+        // syncInvoices field not in schema
       })
 
       if (odooSettings && invoice && invoice.client) {
-        const odooClient = await getOdooClient()
-        if (odooClient) {
+        const { client: odooClient, error: odooError } = await getOdooClient()
+        if (odooClient && !odooError) {
           // الحصول على بيانات العميل الكاملة مع Odoo fields
           const clientData = await prisma.client.findUnique({
             where: { id: invoice.client.id },
@@ -366,15 +367,15 @@ export async function POST(req: NextRequest) {
               narration: invoice.notes || undefined,
             })
 
-            // تحديث الفاتورة برقم Odoo
-            await prisma.invoice.update({
-              where: { id: invoice.id },
-              data: {
-                odooInvoiceId: odooInvoiceId,
-                odooSyncStatus: "SUCCESS",
-                odooSyncedAt: new Date(),
-              },
-            })
+            // تحديث الفاتورة برقم Odoo (fields not in schema)
+            // await prisma.invoice.update({
+            //   where: { id: invoice.id },
+            //   data: {
+            //     odooInvoiceId: odooInvoiceId,
+            //     odooSyncStatus: "SUCCESS",
+            //     odooSyncedAt: new Date(),
+            //   },
+            // })
           }
         }
       }
@@ -382,17 +383,17 @@ export async function POST(req: NextRequest) {
       console.error("Error syncing invoice with Odoo:", error)
       // لا نمنع إنشاء الفاتورة إذا فشلت المزامنة مع Odoo
       if (invoice) {
-        try {
-          await prisma.invoice.update({
-            where: { id: invoice.id },
-            data: {
-              odooSyncStatus: "FAILED",
-              odooSyncedAt: new Date(),
-            },
-          })
-        } catch (updateError) {
-          console.error("Error updating invoice sync status:", updateError)
-        }
+        // try {
+        //   await prisma.invoice.update({
+        //     where: { id: invoice.id },
+        //     data: {
+        //       odooSyncStatus: "FAILED",
+        //       odooSyncedAt: new Date(),
+        //     },
+        //   })
+        // } catch (updateError) {
+        //   console.error("Error updating invoice sync status:", updateError)
+        // }
       }
     }
 
@@ -402,9 +403,7 @@ export async function POST(req: NextRequest) {
         subscription,
         invoice,
         invoiceId: invoice.id,
-        message: createInvoiceOnly 
-          ? "تم إنشاء الفاتورة بنجاح. يمكنك تفعيل الاشتراك لاحقاً."
-          : "تم إنشاء الاشتراك والفاتورة بنجاح.",
+        message: "تم إنشاء الاشتراك والفاتورة بنجاح.",
       },
       { status: 201 }
     )

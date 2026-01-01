@@ -52,9 +52,9 @@ export async function POST(
 
       for (const attendance of attendances) {
         try {
-          // البحث عن العميلة بناءً على fingerprintId
-          const client = await prisma.client.findUnique({
-            where: { fingerprintId: attendance.uid },
+          // البحث عن العميلة بناءً على fingerprintId (fingerprintId ليس unique في schema)
+          const client = await prisma.client.findFirst({
+            where: { fingerprintId: attendance.uid.toString() },
             include: {
               subscriptions: {
                 where: { status: "ACTIVE" },
@@ -97,7 +97,7 @@ export async function POST(
             data: {
               clientId: client.id,
               method: "FINGERPRINT",
-              fingerprintId: attendance.uid,
+              fingerprintId: attendance.uid.toString(),
               checkInDate: checkInDate,
             },
           })

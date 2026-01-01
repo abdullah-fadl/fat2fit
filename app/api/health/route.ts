@@ -1,3 +1,4 @@
+// @ts-nocheck - هذا الملف معطل مؤقتاً لأن Health models غير موجودة في schema
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -23,21 +24,31 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "معرف العميلة مطلوب" }, { status: 400 })
     }
 
+    // هذه الميزة غير مفعلة حالياً - Health models غير موجودة في schema
+    return NextResponse.json(
+      { error: "ميزة التقييم الصحي غير مفعلة حالياً" },
+      { status: 501 }
+    )
+
+    /* الكود أدناه معطل مؤقتاً
     const assessments = await prisma.healthAssessment.findMany({
       where: { clientId },
       orderBy: { assessmentDate: "desc" },
     })
 
+    // @ts-ignore - Health models not in schema
     const measurements = await prisma.bodyMeasurement.findMany({
       where: { clientId },
       orderBy: { measurementDate: "desc" },
     })
 
+    // @ts-ignore - Health models not in schema
     const goals = await prisma.goal.findMany({
       where: { clientId },
       orderBy: { createdAt: "desc" },
     })
 
+    // @ts-ignore - Health models not in schema
     const photos = await prisma.beforeAfterPhoto.findMany({
       where: { clientId },
       orderBy: { takenDate: "desc" },
@@ -73,7 +84,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { type, clientId, data } = body
 
+    // هذه الميزة غير مفعلة حالياً - Health models غير موجودة في schema
+    return NextResponse.json(
+      { error: "ميزة التقييم الصحي غير مفعلة حالياً" },
+      { status: 501 }
+    )
+
+    /* الكود أدناه معطل مؤقتاً
     if (type === "assessment") {
+      // @ts-ignore - Health models not in schema
       const assessment = await prisma.healthAssessment.create({
         data: {
           clientId,
@@ -95,6 +114,7 @@ export async function POST(req: NextRequest) {
       })
       return NextResponse.json(assessment, { status: 201 })
     } else if (type === "measurement") {
+      // @ts-ignore - Health models not in schema
       const measurement = await prisma.bodyMeasurement.create({
         data: {
           clientId,
@@ -113,6 +133,7 @@ export async function POST(req: NextRequest) {
       })
       return NextResponse.json(measurement, { status: 201 })
     } else if (type === "goal") {
+      // @ts-ignore - Health models not in schema
       const goal = await prisma.goal.create({
         data: {
           clientId,
@@ -128,6 +149,7 @@ export async function POST(req: NextRequest) {
       })
       return NextResponse.json(goal, { status: 201 })
     } else if (type === "photo") {
+      // @ts-ignore - Health models not in schema
       const photo = await prisma.beforeAfterPhoto.create({
         data: {
           clientId,
@@ -141,6 +163,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: "نوع غير صحيح" }, { status: 400 })
+    */
   } catch (error) {
     console.error("Error creating health data:", error)
     return NextResponse.json(

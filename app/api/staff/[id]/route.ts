@@ -25,14 +25,16 @@ export async function GET(
     const staff = await prisma.user.findUnique({
       where: { id: resolvedParams.id },
       include: {
-        staffSchedules: {
-          orderBy: { dayOfWeek: "asc" },
-        },
-        classes: true,
+        // staffSchedules not in schema
+        // staffSchedules: {
+        //   orderBy: { dayOfWeek: "asc" },
+        // },
+        // classes: true, // Class model not in schema
         _count: {
           select: {
-            bookings: true,
-            classes: true,
+            // bookings and classes models not in schema
+            // bookings: true,
+            // classes: true,
           },
         },
       },
@@ -112,12 +114,13 @@ export async function PUT(
     const updatedUser = await prisma.user.update({
       where: { id: resolvedParams.id },
       data: updateData,
-      include: {
-        staffSchedules: true,
-      },
+      // include: {
+      //   staffSchedules: true, // staffSchedules not in schema
+      // },
     })
 
-    // Update schedules if provided
+    // Update schedules if provided (staffSchedule model not in schema)
+    /*
     if (schedules) {
       // Delete old schedules
       await prisma.staffSchedule.deleteMany({
@@ -137,12 +140,13 @@ export async function PUT(
         })
       }
     }
+    */
 
     const finalUser = await prisma.user.findUnique({
       where: { id: resolvedParams.id },
-      include: {
-        staffSchedules: true,
-      },
+      // include: {
+      //   staffSchedules: true, // staffSchedules not in schema
+      // },
     })
 
     // Create audit log

@@ -17,6 +17,33 @@ export const authOptions: NextAuthConfig = {
             return null
           }
 
+          // تسجيل دخول تجريبي ثابت للديمو (بدون قاعدة بيانات)
+          if (
+            credentials.email === "demo@fat2fit.com" &&
+            credentials.password === "123456"
+          ) {
+            return {
+              id: "demo-admin-001",
+              email: "demo@fat2fit.com",
+              name: "مديرة النظام (ديمو)",
+              role: "ADMIN",
+            }
+          }
+
+          // تسجيل دخول موظفة استقبال تجريبية
+          if (
+            credentials.email === "demo-reception@fat2fit.com" &&
+            credentials.password === "123456"
+          ) {
+            return {
+              id: "demo-reception-001",
+              email: "demo-reception@fat2fit.com",
+              name: "موظفة الاستقبال (ديمو)",
+              role: "RECEPTION",
+            }
+          }
+
+          // تسجيل دخول من قاعدة البيانات (للاستخدام الفعلي)
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string }
           })

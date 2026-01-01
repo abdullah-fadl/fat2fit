@@ -11,7 +11,7 @@ export const authOptions: NextAuthConfig = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials, request) {
+      async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
             return null
@@ -36,7 +36,7 @@ export const authOptions: NextAuthConfig = {
 
           return {
             id: user.id,
-            email: user.email,
+            email: user.email || "",
             name: user.name,
             role: user.role,
           }

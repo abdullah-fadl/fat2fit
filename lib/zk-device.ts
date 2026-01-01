@@ -34,9 +34,9 @@ export class ZKDevice {
 
   constructor(config: ZKDeviceConfig) {
     this.config = {
-      port: 4370,
       timeout: 5000,
       ...config,
+      port: config.port ?? 4370,
     }
   }
 
@@ -220,6 +220,7 @@ export class ZKDevice {
 export async function createZKDevice(config: ZKDeviceConfig): Promise<ZKDevice> {
   try {
     // محاولة استخدام مكتبة zkteco
+    // @ts-ignore - zkteco library doesn't have TypeScript definitions
     const zkteco = await import("zkteco")
     
     // إذا كانت المكتبة موجودة، استخدمها

@@ -86,6 +86,10 @@ export async function createDatabaseBackup(
       }
     } else if (dbUrl?.startsWith("file:") || dbUrl?.endsWith(".db")) {
       // SQLite backup
+      if (!dbUrl) {
+        throw new Error("DATABASE_URL is not set")
+      }
+      
       backupFileName += ".db"
       const backupPath = path.join(backupDir, backupFileName)
       const dbPath = dbUrl.replace("file:", "").replace("?connection_limit=1", "")
@@ -219,6 +223,14 @@ export async function restoreBackup(
       return { success: true }
     } else {
       // SQLite restore (استبدال الملف)
+      if (!dbUrl) {
+        throw new Error("DATABASE_URL is not set")
+      }
+      
+      if (!dbUrl.startsWith("file:")) {
+        throw new Error("SQLite restore is only supported for file: databases")
+      }
+      
       const dbPath = dbUrl.replace("file:", "").replace("?connection_limit=1", "")
       let dbFile = backupFilePath
       

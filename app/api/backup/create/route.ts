@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
-import { requirePermission } from "@/lib/auth-utils"
-import { PERMISSIONS } from "@/lib/permissions"
 import { createDatabaseBackup, cleanupOldBackups } from "@/lib/backup"
 import { logCreate } from "@/lib/audit-log"
 
@@ -11,17 +9,12 @@ import { logCreate } from "@/lib/audit-log"
  */
 export async function POST(req: NextRequest) {
   try {
-    // التحقق من الصلاحية (ADMIN فقط)
-    const permCheck = await requirePermission(
-      PERMISSIONS.STAFF_MANAGE || "admin.access", // TODO: إضافة صلاحية خاصة
-      "غير مصرح لك بإنشاء نسخة احتياطية"
-    )
-
     const session = await auth()
     if (!session) {
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
+    // التحقق من الصلاحية (ADMIN فقط)
     const userRole = (session.user as any)?.role
     if (userRole !== "ADMIN") {
       return NextResponse.json(
@@ -51,12 +44,13 @@ export async function POST(req: NextRequest) {
 
     // تسجيل في سجل الأنشطة
     const userId = (session.user as any)?.id || ""
-    await logCreate({
+    await logCreate(
       userId,
-      entityType: "Backup",
-      entityId: result.filePath || "unknown",
-      description: `تم إنشاء نسخة احتياطية: ${result.filePath}`,
-    })
+      "Backup",
+      result.filePath || "unknown",
+      { filePath: result.filePath, size: result.size },
+      `تم إنشاء نسخة احتياطية: ${result.filePath}`
+    )
 
     return NextResponse.json({
       success: true,

@@ -12,6 +12,7 @@ export type EntityType =
   | "Coupon"
   | "CheckIn"
   | "ZKDevice"
+  | "Backup"
 
 interface AuditLogData {
   userId: string

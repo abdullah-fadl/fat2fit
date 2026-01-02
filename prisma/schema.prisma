@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite" // Changed to sqlite for local development. Change back to postgresql for production.
   url      = env("DATABASE_URL")
 }
 
@@ -23,9 +23,10 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  auditLogs AuditLog[]
-  checkIns  CheckIn[]
-  invoices  Invoice[]
+  auditLogs  AuditLog[]
+  accessLogs AccessLog[]
+  checkIns   CheckIn[]
+  invoices   Invoice[]
 
   @@map("users")
 }
@@ -300,54 +301,57 @@ model OdooSettings {
 
 // إعدادات الأمان والخصوصية
 model SecuritySettings {
-  id                    String  @id @default(uuid())
-  
+  id String @id @default(uuid())
+
   // التشفير
-  encryptionEnabled     Boolean @default(true)
-  encryptPhoneNumbers   Boolean @default(true)
-  encryptNames          Boolean @default(false)
-  encryptEmails         Boolean @default(false)
-  
+  encryptionEnabled   Boolean @default(true)
+  encryptPhoneNumbers Boolean @default(true)
+  encryptNames        Boolean @default(false)
+  encryptEmails       Boolean @default(false)
+
   // النسخ الاحتياطي
-  autoBackupEnabled     Boolean @default(true)
-  backupIntervalHours   Int     @default(24) // كل 24 ساعة
-  backupRetentionDays   Int     @default(30) // الاحتفاظ بـ 30 يوم
-  
+  autoBackupEnabled   Boolean @default(true)
+  backupIntervalHours Int     @default(24) // كل 24 ساعة
+  backupRetentionDays Int     @default(30) // الاحتفاظ بـ 30 يوم
+
   // الأمان
   requireStrongPassword Boolean @default(true)
   sessionTimeoutMinutes Int     @default(60) // انتهاء الجلسة بعد 60 دقيقة
   maxLoginAttempts      Int     @default(5) // أقصى محاولات دخول
-  
+
   // الخصوصية
   allowDataExport       Boolean @default(false) // السماح بتصدير البيانات
   anonymizeLogs         Boolean @default(true) // إخفاء البيانات الحساسة في الـ logs
   auditLogRetentionDays Int     @default(365) // الاحتفاظ بسجل الأنشطة لـ 365 يوم
-  
+
   // GDPR/Privacy
-  gdprCompliant         Boolean @default(true)
-  dataRetentionDays     Int?    // عدد أيام الاحتفاظ بالبيانات (null = إلى ما لا نهاية)
-  rightToDelete         Boolean @default(true) // حق حذف البيانات
-  
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  
+  gdprCompliant     Boolean @default(true)
+  dataRetentionDays Int? // عدد أيام الاحتفاظ بالبيانات (null = إلى ما لا نهاية)
+  rightToDelete     Boolean @default(true) // حق حذف البيانات
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("security_settings")
 }
 
 // سجل الوصول (Access Log)
 model AccessLog {
-  id          String   @id @default(uuid())
-  userId      String?
-  ipAddress   String
-  userAgent   String?
-  action      String   // LOGIN, LOGOUT, VIEW_DATA, EXPORT_DATA, etc.
-  resource    String?  // نوع المورد (Client, Subscription, etc.)
-  resourceId  String?  // معرف المورد
-  success     Boolean  @default(true)
+  id           String  @id @default(uuid())
+  userId       String?
+  ipAddress    String
+  userAgent    String?
+  action       String // LOGIN, LOGOUT, VIEW_DATA, EXPORT_DATA, etc.
+  resource     String? // نوع المورد (Client, Subscription, etc.)
+  resourceId   String? // معرف المورد
+  success      Boolean @default(true)
   errorMessage String?
-  
-  createdAt   DateTime @default(now())
-  
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   @@index([userId, createdAt])
   @@index([ipAddress])
   @@index([action, createdAt])

@@ -61,6 +61,7 @@ model Client {
   invoices      Invoice[]
   checkIns      CheckIn[]
   clientNotes   ClientNote[]
+  messages      Message[]
 
   @@map("clients")
 }
@@ -295,4 +296,156 @@ model OdooSettings {
 
   @@unique([url, database])
   @@map("odoo_settings")
+}
+
+// إعدادات الأمان والخصوصية
+model SecuritySettings {
+  id                    String  @id @default(uuid())
+  
+  // التشفير
+  encryptionEnabled     Boolean @default(true)
+  encryptPhoneNumbers   Boolean @default(true)
+  encryptNames          Boolean @default(false)
+  encryptEmails         Boolean @default(false)
+  
+  // النسخ الاحتياطي
+  autoBackupEnabled     Boolean @default(true)
+  backupIntervalHours   Int     @default(24) // كل 24 ساعة
+  backupRetentionDays   Int     @default(30) // الاحتفاظ بـ 30 يوم
+  
+  // الأمان
+  requireStrongPassword Boolean @default(true)
+  sessionTimeoutMinutes Int     @default(60) // انتهاء الجلسة بعد 60 دقيقة
+  maxLoginAttempts      Int     @default(5) // أقصى محاولات دخول
+  
+  // الخصوصية
+  allowDataExport       Boolean @default(false) // السماح بتصدير البيانات
+  anonymizeLogs         Boolean @default(true) // إخفاء البيانات الحساسة في الـ logs
+  auditLogRetentionDays Int     @default(365) // الاحتفاظ بسجل الأنشطة لـ 365 يوم
+  
+  // GDPR/Privacy
+  gdprCompliant         Boolean @default(true)
+  dataRetentionDays     Int?    // عدد أيام الاحتفاظ بالبيانات (null = إلى ما لا نهاية)
+  rightToDelete         Boolean @default(true) // حق حذف البيانات
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("security_settings")
+}
+
+// سجل الوصول (Access Log)
+model AccessLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  ipAddress   String
+  userAgent   String?
+  action      String   // LOGIN, LOGOUT, VIEW_DATA, EXPORT_DATA, etc.
+  resource    String?  // نوع المورد (Client, Subscription, etc.)
+  resourceId  String?  // معرف المورد
+  success     Boolean  @default(true)
+  errorMessage String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, createdAt])
+  @@index([ipAddress])
+  @@index([action, createdAt])
+  @@map("access_logs")
+}
+
+// الرسائل والتواصل
+model Message {
+  id         String  @id @default(uuid())
+  clientId   String?
+  campaignId String?
+
+  type         String // SMS, WHATSAPP, EMAIL
+  channel      String // SMS, WHATSAPP, EMAIL
+  content      String // محتوى الرسالة
+  status       String  @default("PENDING") // PENDING, SENT, FAILED, DELIVERED
+  errorMessage String?
+
+  phoneNumber   String? // رقم الهاتف المستلم
+  recipientName String?
+
+  sentAt      DateTime?
+  deliveredAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  client   Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  campaign Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([clientId])
+  @@index([campaignId])
+  @@index([status])
+  @@map("messages")
+}
+
+// الحملات التسويقية
+model Campaign {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  type    String // PROMOTIONAL, REMINDER, WELCOME, EXPIRY_REMINDER
+  channel String // SMS, WHATSAPP, EMAIL, ALL
+  content String // محتوى الرسالة (يمكن استخدام متغيرات مثل {name}, {membershipNumber})
+
+  targetType String // ALL_CLIENTS, ACTIVE_SUBSCRIPTIONS, EXPIRING_SUBSCRIPTIONS, SPECIFIC_CLIENTS
+  filters    String? // JSON filters (package type, subscription status, etc.)
+
+  status      String    @default("DRAFT") // DRAFT, SCHEDULED, RUNNING, COMPLETED, CANCELLED
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  totalRecipients Int @default(0)
+  sentCount       Int @default(0)
+  deliveredCount  Int @default(0)
+  failedCount     Int @default(0)
+
+  createdBy String // User ID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  messages Message[]
+
+  @@map("campaigns")
+}
+
+// إعدادات الرسائل
+model MessageSettings {
+  id String @id @default(uuid())
+
+  // SMS Settings
+  smsProvider  String? // TWILIO, CUSTOM_API, etc.
+  smsApiKey    String?
+  smsApiSecret String?
+  smsSenderId  String?
+
+  // WhatsApp Settings
+  whatsappProvider    String? // TWILIO, META, CUSTOM_API
+  whatsappApiKey      String?
+  whatsappApiSecret   String?
+  whatsappPhoneNumber String?
+
+  // تذكيرات تلقائية
+  expiryReminderEnabled Boolean @default(true)
+  expiryReminderDays    String  @default("7,3,1") // أيام قبل الانتهاء
+  expiryReminderMessage String  @default("عزيزتي {name}، اشتراكك سينتهي في {days} يوم. يرجى التجديد قريباً.")
+
+  welcomeMessageEnabled Boolean @default(true)
+  welcomeMessage        String  @default("مرحباً {name}! شكراً لانضمامك إلى Fat2Fit 🎉")
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("message_settings")
 }

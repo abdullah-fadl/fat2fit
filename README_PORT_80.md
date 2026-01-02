@@ -37,3 +37,4 @@ npm run dev
 - في macOS، المنافذ أقل من 1024 تحتاج صلاحيات root
 - للإنتاج، استخدم reverse proxy (Nginx/Apache) بدلاً من تشغيل Node مباشرة على 80
 
+

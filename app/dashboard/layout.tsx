@@ -19,6 +19,9 @@ import {
   Settings,
   Fingerprint,
   History,
+  Megaphone,
+  Messages,
+  Shield,
 } from "lucide-react"
 export default async function DashboardLayout({
   children,
@@ -93,13 +96,31 @@ export default async function DashboardLayout({
       name: "أجهزة البصمة ZK",
       href: "/dashboard/zk-devices",
       icon: Fingerprint,
-      permission: PERMISSIONS.STAFF_VIEW,
+      permission: PERMISSIONS.ZK_DEVICES_VIEW,
     },
     {
       name: "سجل الأنشطة",
       href: "/dashboard/audit-logs",
       icon: History,
       permission: PERMISSIONS.AUDIT_LOG_VIEW,
+    },
+    {
+      name: "الحملات التسويقية",
+      href: "/dashboard/campaigns",
+      icon: Megaphone,
+      permission: PERMISSIONS.CAMPAIGNS_VIEW,
+    },
+    {
+      name: "الرسائل",
+      href: "/dashboard/messages",
+      icon: Messages,
+      permission: PERMISSIONS.MESSAGES_VIEW,
+    },
+    {
+      name: "الأمان والخصوصية",
+      href: "/dashboard/security",
+      icon: Shield,
+      permission: PERMISSIONS.STAFF_VIEW, // ADMIN only
     },
   ].filter((item) => {
     return hasPermission(userRole, item.permission)

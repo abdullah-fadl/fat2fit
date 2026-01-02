@@ -22,10 +22,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
-    // السماح للمديرات فقط حالياً
-    const userRole = (session.user as any)?.role
-    if (userRole !== "ADMIN") {
-      return NextResponse.json({ error: "غير مصرح - هذه الصفحة للمديرات فقط" }, { status: 403 })
+    // التحقق من الصلاحية
+    const permCheck = await requirePermission(PERMISSIONS.ZK_DEVICES_VIEW, "غير مصرح لك بعرض أجهزة البصمة")
+    if (permCheck.error) {
+      return permCheck.response
     }
 
     // التحقق من Prisma
@@ -84,10 +84,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
-    // السماح للمديرات فقط
-    const userRole = (session.user as any)?.role
-    if (userRole !== "ADMIN") {
-      return NextResponse.json({ error: "غير مصرح - هذه الصفحة للمديرات فقط" }, { status: 403 })
+    // التحقق من الصلاحية
+    const permCheck = await requirePermission(PERMISSIONS.ZK_DEVICES_MANAGE, "غير مصرح لك بإدارة أجهزة البصمة")
+    if (permCheck.error) {
+      return permCheck.response
     }
 
     const body = await req.json()

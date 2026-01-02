@@ -43,3 +43,4 @@ CREATE TABLE "odoo_settings" (
 
 
 
+

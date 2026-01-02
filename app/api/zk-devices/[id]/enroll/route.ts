@@ -18,9 +18,10 @@ export async function POST(
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
-    const userRole = (session.user as any)?.role
-    if (userRole !== "ADMIN") {
-      return NextResponse.json({ error: "غير مصرح - هذه الصفحة للمديرات فقط" }, { status: 403 })
+    // التحقق من الصلاحية
+    const permCheck = await requirePermission(PERMISSIONS.ZK_DEVICES_MANAGE, "غير مصرح لك بتسجيل البصمة")
+    if (permCheck.error) {
+      return permCheck.response
     }
 
     const resolvedParams = await Promise.resolve(params)

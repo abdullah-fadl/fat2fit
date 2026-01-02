@@ -65,8 +65,19 @@ export const PERMISSIONS = {
   REPORTS_VIEW: "reports.view",
   REPORTS_EXPORT: "reports.export",
 
-  // سجل الأنشطة
+  // سجل الأنشطة (Audit Log)
   AUDIT_LOG_VIEW: "audit_log.view",
+
+  // أجهزة البصمة ZK
+  ZK_DEVICES_VIEW: "zk_devices.view",
+  ZK_DEVICES_MANAGE: "zk_devices.manage",
+
+  // الرسائل والحملات التسويقية
+  MESSAGES_VIEW: "messages.view",
+  MESSAGES_SEND: "messages.send",
+  CAMPAIGNS_VIEW: "campaigns.view",
+  CAMPAIGNS_CREATE: "campaigns.create",
+  CAMPAIGNS_MANAGE: "campaigns.manage",
 } as const
 
 // الصلاحيات لكل دور
@@ -74,7 +85,6 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
   ADMIN: [
     // كل الصلاحيات
     ...Object.values(PERMISSIONS),
-    PERMISSIONS.AUDIT_LOG_VIEW,
   ],
 
   RECEPTION: [
@@ -110,6 +120,18 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
 
     // التقارير
     PERMISSIONS.REPORTS_VIEW,
+
+    // الرسائل والحملات
+    PERMISSIONS.MESSAGES_VIEW,
+    PERMISSIONS.MESSAGES_SEND,
+    PERMISSIONS.CAMPAIGNS_VIEW,
+    PERMISSIONS.CAMPAIGNS_CREATE,
+
+    // ملاحظة: RECEPTION لا يمكنها الوصول إلى:
+    // - AUDIT_LOG_VIEW (سجل الأنشطة)
+    // - ZK_DEVICES_VIEW (أجهزة البصمة)
+    // - STAFF_* (إدارة الموظفات)
+    // - CAMPAIGNS_MANAGE (إدارة متقدمة للحملات)
   ],
 
   TRAINER: [

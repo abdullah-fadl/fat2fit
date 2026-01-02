@@ -73,3 +73,4 @@ curl -X POST https://bperformance-scop.odoo.com/xmlrpc/2/common \
 
 
 
+

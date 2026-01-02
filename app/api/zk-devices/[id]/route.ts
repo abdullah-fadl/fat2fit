@@ -18,9 +18,10 @@ export async function GET(
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
-    const userRole = (session.user as any)?.role
-    if (userRole !== "ADMIN") {
-      return NextResponse.json({ error: "غير مصرح - هذه الصفحة للمديرات فقط" }, { status: 403 })
+    // التحقق من الصلاحية
+    const permCheck = await requirePermission(PERMISSIONS.ZK_DEVICES_VIEW, "غير مصرح لك بعرض أجهزة البصمة")
+    if (permCheck.error) {
+      return permCheck.response
     }
 
     const resolvedParams = await Promise.resolve(params)
@@ -55,9 +56,10 @@ export async function PUT(
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
-    const userRole = (session.user as any)?.role
-    if (userRole !== "ADMIN") {
-      return NextResponse.json({ error: "غير مصرح - هذه الصفحة للمديرات فقط" }, { status: 403 })
+    // التحقق من الصلاحية
+    const permCheck = await requirePermission(PERMISSIONS.ZK_DEVICES_MANAGE, "غير مصرح لك بتعديل أجهزة البصمة")
+    if (permCheck.error) {
+      return permCheck.response
     }
 
     const resolvedParams = await Promise.resolve(params)
@@ -99,9 +101,10 @@ export async function DELETE(
       return NextResponse.json({ error: "غير مصرح" }, { status: 401 })
     }
 
-    const userRole = (session.user as any)?.role
-    if (userRole !== "ADMIN") {
-      return NextResponse.json({ error: "غير مصرح - هذه الصفحة للمديرات فقط" }, { status: 403 })
+    // التحقق من الصلاحية
+    const permCheck = await requirePermission(PERMISSIONS.ZK_DEVICES_MANAGE, "غير مصرح لك بحذف أجهزة البصمة")
+    if (permCheck.error) {
+      return permCheck.response
     }
 
     const resolvedParams = await Promise.resolve(params)

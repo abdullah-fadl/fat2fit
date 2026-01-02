@@ -58,8 +58,15 @@ export const authOptions: NextAuthConfig = {
           )
 
           if (!isPasswordValid) {
+            // تسجيل محاولة دخول فاشلة
+            const { logLogin } = await import("./access-log")
+            await logLogin(user.id, false, "Invalid password")
             return null
           }
+
+          // تسجيل تسجيل دخول ناجح
+          const { logLogin } = await import("./access-log")
+          await logLogin(user.id, true)
 
           return {
             id: user.id,

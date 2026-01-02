@@ -216,19 +216,23 @@ export class ZKDevice {
 
 /**
  * استخدام مكتبة zkteco إذا كانت متاحة
+ * ملاحظة: المكتبة اختيارية ولا توجد في dependencies الافتراضية
  */
 export async function createZKDevice(config: ZKDeviceConfig): Promise<ZKDevice> {
-  try {
-    // محاولة استخدام مكتبة zkteco
-    // @ts-ignore - zkteco library doesn't have TypeScript definitions
-    const zkteco = await import("zkteco")
-    
-    // إذا كانت المكتبة موجودة، استخدمها
-    return new ZKDevice(config)
-  } catch {
-    // إذا لم تكن موجودة، استخدم التطبيق المخصص
-    return new ZKDevice(config)
+  // التحقق من متغير البيئة أولاً
+  // إذا لم يكن مفعّل، نرجع خطأ واضح
+  if (process.env.ENABLE_ZKTECO !== "true") {
+    throw new Error("ZKTeco integration is disabled. Set ENABLE_ZKTECO=true to enable.")
   }
+
+  // ملاحظة: مكتبة zkteco غير موجودة في dependencies الافتراضية
+  // نستخدم التطبيق المخصص (ZKDevice class) الذي يعمل عبر TCP مباشرة
+  // إذا كنت تريد استخدام مكتبة zkteco، يجب تثبيتها أولاً:
+  // npm install zkteco
+  // ثم تفعيلها عبر ENABLE_ZKTECO=true
+  
+  // في الوقت الحالي، نستخدم التطبيق المخصص فقط
+  return new ZKDevice(config)
 }
 
 

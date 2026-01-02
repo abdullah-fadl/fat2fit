@@ -20,7 +20,7 @@ import {
   Fingerprint,
   History,
   Megaphone,
-  Messages,
+  MessagesSquare,
   Shield,
 } from "lucide-react"
 export default async function DashboardLayout({
@@ -113,7 +113,7 @@ export default async function DashboardLayout({
     {
       name: "الرسائل",
       href: "/dashboard/messages",
-      icon: Messages,
+      icon: MessagesSquare,
       permission: PERMISSIONS.MESSAGES_VIEW,
     },
     {

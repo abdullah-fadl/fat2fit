@@ -254,7 +254,6 @@ async function sendCampaignMessages(campaignId: string) {
       where: { id: campaignId },
       data: {
         status: "CANCELLED",
-        errorMessage: error.message,
       },
     })
   }

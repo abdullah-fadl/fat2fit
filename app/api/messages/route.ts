@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
       phoneNumber,
       content,
       channel: channel as "SMS" | "WHATSAPP" | "EMAIL",
-      recipientName,
+      recipientName: recipientName ?? undefined,
     })
 
     // حفظ الرسالة في قاعدة البيانات

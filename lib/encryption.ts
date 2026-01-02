@@ -74,7 +74,7 @@ export function decryptData(encryptedText: string): string {
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv)
     decipher.setAuthTag(tag)
     
-    let decrypted = decipher.update(encrypted, null, "utf8")
+    let decrypted = decipher.update(encrypted, undefined, "utf8")
     decrypted += decipher.final("utf8")
     
     return decrypted

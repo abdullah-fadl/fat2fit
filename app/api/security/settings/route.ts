@@ -116,7 +116,7 @@ export async function PUT(req: NextRequest) {
     const userId = (session.user as any)?.id || ""
     await logUpdate(
       userId,
-      "SecuritySettings" as any,
+      "SecuritySettings",
       settings.id,
       oldSettings,
       updatedSettings,

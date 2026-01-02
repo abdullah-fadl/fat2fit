@@ -126,12 +126,13 @@ export async function POST(req: NextRequest) {
     }
 
     // إنشاء سجل تدقيق
-    await logCreate({
+    await logCreate(
       userId,
-      entityType: "Campaign",
-      entityId: campaign.id,
-      description: `تم إنشاء حملة تسويقية: ${name}`,
-    })
+      "Campaign",
+      campaign.id,
+      campaign,
+      `تم إنشاء حملة تسويقية: ${name}`
+    )
 
     return NextResponse.json(campaign, { status: 201 })
   } catch (error: any) {

@@ -152,12 +152,13 @@ export async function POST(req: NextRequest) {
 
     // إنشاء سجل تدقيق
     const userId = (session.user as any)?.id || ""
-    await logCreate({
+    await logCreate(
       userId,
-      entityType: "Message",
-      entityId: message.id,
-      description: `تم إرسال رسالة ${channel} إلى ${recipientName || phoneNumber}`,
-    })
+      "Message",
+      message.id,
+      { channel, recipient: recipientName || phoneNumber, content },
+      `تم إرسال رسالة ${channel} إلى ${recipientName || phoneNumber}`
+    )
 
     if (!result.success) {
       return NextResponse.json(

@@ -13,6 +13,9 @@ export type EntityType =
   | "CheckIn"
   | "ZKDevice"
   | "Backup"
+  | "Campaign"
+  | "Message"
+  | "SecuritySettings"
 
 interface AuditLogData {
   userId: string

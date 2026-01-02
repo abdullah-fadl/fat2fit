@@ -38,16 +38,27 @@ export async function POST(
       )
     }
 
+    // حفظ الحالة القديمة قبل التحديث
+    const oldCampaignData = {
+      status: campaign.status,
+      startedAt: campaign.startedAt,
+      completedAt: campaign.completedAt,
+    }
+
     // بدء إرسال الرسائل في الخلفية
     sendCampaignMessages(campaign.id).catch(console.error)
 
     const userId = (session.user as any)?.id || ""
-    await logUpdate({
+    
+    // تسجيل في سجل الأنشطة
+    await logUpdate(
       userId,
-      entityType: "Campaign",
-      entityId: campaign.id,
-      description: `تم بدء إرسال الحملة: ${campaign.name}`,
-    })
+      "Campaign",
+      campaign.id,
+      oldCampaignData,
+      { status: "RUNNING", startedAt: new Date() },
+      `تم بدء إرسال الحملة: ${campaign.name}`
+    )
 
     return NextResponse.json({ success: true, message: "تم بدء إرسال الحملة" })
   } catch (error: any) {

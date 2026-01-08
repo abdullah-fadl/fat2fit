@@ -123,7 +123,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">لوحة الاستقبال</h1>
-        <p className="mt-2 text-gray-600">إدارة العميلات والاشتراكات</p>
+        <p className="mt-2 text-gray-600">إدارة العضوية والاشتراكات</p>
       </div>
 
       {/* Stats Cards */}
@@ -131,7 +131,7 @@ export default function DashboardPage() {
         <div className="rounded-lg bg-white p-6 shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">إجمالي العميلات</p>
+              <p className="text-sm text-gray-600">إجمالي العضويات</p>
               <p className="mt-1 text-2xl font-bold text-gray-900">{stats.total}</p>
             </div>
             <Users className="h-8 w-8 text-blue-500" />
@@ -178,7 +178,7 @@ export default function DashboardPage() {
           className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-medium text-white transition-colors hover:from-pink-600 hover:to-purple-700"
         >
           <UserPlus className="h-5 w-5" />
-          تسجيل عميلة جديدة
+          إنشاء عضوية جديدة
         </Link>
         <Link
           href="/dashboard/checkin"

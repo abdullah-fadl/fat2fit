@@ -31,12 +31,13 @@ model User {
   @@map("users")
 }
 
-// العميلات
+// الأعضاء (العضوية)
 model Client {
   id               String    @id @default(uuid())
   membershipNumber String    @unique // رقم العضوية
   name             String
   phone            String    @unique
+  idNumber         String?   @unique // رقم الهوية
   email            String?
   dateOfBirth      DateTime?
   height           Float? // الطول بالسم
@@ -175,6 +176,7 @@ model Invoice {
   // معلومات إضافية
   notes      String?
   couponCode String?
+  subscriptionType String? // نوع الاشتراك (الباقة)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

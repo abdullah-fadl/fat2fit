@@ -60,6 +60,8 @@ export async function PUT(
       requiredPermission = PERMISSIONS.SUBSCRIPTIONS_FREEZE
     } else if (action === "renew" || action === "upgrade") {
       requiredPermission = PERMISSIONS.SUBSCRIPTIONS_RENEW
+    } else if (action === "extend") {
+      requiredPermission = PERMISSIONS.SUBSCRIPTIONS_EXTEND
     }
 
     const permCheck = await requirePermission(requiredPermission as any)
@@ -399,6 +401,50 @@ export async function PUT(
       ).catch((error) => console.error("Error creating audit log:", error))
 
       return NextResponse.json({ subscription: updatedSubscription, priceDifference })
+    } else if (action === "extend") {
+      // إضافة مدة للاشتراك
+      const { additionalDays, reason } = body
+
+      if (!additionalDays || additionalDays <= 0) {
+        return NextResponse.json(
+          { error: "يجب تحديد عدد الأيام المراد إضافتها (أكبر من صفر)" },
+          { status: 400 }
+        )
+      }
+
+      const daysToAdd = parseInt(additionalDays)
+      const currentEndDate = subscription.endDate
+      const newEndDate = addDays(currentEndDate, daysToAdd)
+
+      // تحديث تاريخ الانتهاء الأصلي أيضاً إذا لزم الأمر
+      const updatedOriginalEndDate = subscription.isFrozen 
+        ? subscription.originalEndDate 
+        : addDays(subscription.originalEndDate || subscription.startDate, 
+            differenceInDays(subscription.endDate, subscription.startDate) + daysToAdd)
+
+      const updatedSubscription = await prisma.subscription.update({
+        where: { id: resolvedParams.id },
+        data: {
+          endDate: newEndDate,
+          originalEndDate: updatedOriginalEndDate,
+        },
+        include: {
+          client: true,
+          package: true,
+        },
+      })
+
+      // إنشاء سجل تدقيق
+      logUpdate(
+        userId,
+        "Subscription",
+        subscription.id,
+        subscription,
+        updatedSubscription,
+        `تم إضافة ${daysToAdd} يوم لاشتراك العميلة: ${subscription.client.name}. ${reason ? `السبب: ${reason}` : ""}`
+      ).catch((error) => console.error("Error creating audit log:", error))
+
+      return NextResponse.json(updatedSubscription)
     } else {
       return NextResponse.json(
         { error: "عملية غير صحيحة" },

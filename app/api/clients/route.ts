@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
     const {
       name,
       phone,
+      idNumber,
       email,
       dateOfBirth,
       height,
@@ -129,6 +130,7 @@ export async function POST(req: NextRequest) {
           data: {
             name,
             phone,
+            idNumber: idNumber || null,
             email: email || null,
             dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
             height: height ? parseFloat(height) : null,

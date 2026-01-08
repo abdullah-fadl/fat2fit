@@ -20,6 +20,7 @@ export const PERMISSIONS = {
   SUBSCRIPTIONS_RENEW: "subscriptions.renew",
   SUBSCRIPTIONS_FREEZE: "subscriptions.freeze",
   SUBSCRIPTIONS_CANCEL: "subscriptions.cancel",
+  SUBSCRIPTIONS_EXTEND: "subscriptions.extend", // إضافة مدة للاشتراك
 
   // الباقات
   PACKAGES_VIEW: "packages.view",
@@ -88,7 +89,7 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
   ],
 
   RECEPTION: [
-    // العميلات
+    // العميلات (العضوية)
     PERMISSIONS.CLIENTS_VIEW,
     PERMISSIONS.CLIENTS_CREATE,
     PERMISSIONS.CLIENTS_EDIT,
@@ -98,6 +99,7 @@ export const ROLE_PERMISSIONS: Record<Role, string[]> = {
     PERMISSIONS.SUBSCRIPTIONS_CREATE,
     PERMISSIONS.SUBSCRIPTIONS_RENEW,
     PERMISSIONS.SUBSCRIPTIONS_FREEZE,
+    PERMISSIONS.SUBSCRIPTIONS_EXTEND,
 
     // الباقات
     PERMISSIONS.PACKAGES_VIEW,

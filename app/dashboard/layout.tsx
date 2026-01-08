@@ -45,7 +45,7 @@ export default async function DashboardLayout({
       permission: PERMISSIONS.CLIENTS_VIEW,
     },
     {
-      name: "العميلات",
+      name: "العضوية",
       href: "/dashboard/clients",
       icon: Users,
       permission: PERMISSIONS.CLIENTS_VIEW,

@@ -24,6 +24,7 @@ interface Invoice {
       nameAr: string
     }
   } | null
+  subscriptionType: string | null
   subtotal: number
   discountAmount: number
   taxAmount: number
@@ -344,7 +345,7 @@ export default function InvoiceDetailPage() {
         {/* Client Info */}
         <div className="mb-8 grid grid-cols-2 gap-8">
           <div>
-            <h2 className="mb-4 text-lg font-bold text-gray-900">معلومات العميلة</h2>
+            <h2 className="mb-4 text-lg font-bold text-gray-900">معلومات العضوية</h2>
             <div className="space-y-3 text-base">
               <p>
                 <span className="text-sm font-medium text-gray-600">الاسم:</span>{" "}
@@ -377,21 +378,21 @@ export default function InvoiceDetailPage() {
                   </span>
                 </p>
               )}
+              {invoice.subscriptionType && (
+                <p>
+                  <span className="text-sm font-medium text-gray-600">نوع الاشتراك:</span>{" "}
+                  <span className="text-base font-bold text-gray-900">{invoice.subscriptionType}</span>
+                </p>
+              )}
               {invoice.subscription && (
-                <>
-                  <p>
-                    <span className="text-sm font-medium text-gray-600">الباقة:</span>{" "}
-                    <span className="text-base font-bold text-gray-900">{invoice.subscription.package.nameAr}</span>
-                  </p>
-                  <p>
-                    <span className="text-sm font-medium text-gray-600">حالة الاشتراك:</span>{" "}
-                    <span className={`text-base font-bold ${
-                      invoice.subscription.status === "ACTIVE" ? "text-green-600" : "text-yellow-600"
-                    }`}>
-                      {invoice.subscription.status === "ACTIVE" ? "مفعل" : "غير مفعل (بانتظار الدفع)"}
-                    </span>
-                  </p>
-                </>
+                <p>
+                  <span className="text-sm font-medium text-gray-600">حالة الاشتراك:</span>{" "}
+                  <span className={`text-base font-bold ${
+                    invoice.subscription.status === "ACTIVE" ? "text-green-600" : "text-yellow-600"
+                  }`}>
+                    {invoice.subscription.status === "ACTIVE" ? "مفعل" : "غير مفعل (بانتظار الدفع)"}
+                  </span>
+                </p>
               )}
             </div>
           </div>
@@ -409,7 +410,9 @@ export default function InvoiceDetailPage() {
             <tbody className="divide-y divide-gray-200">
               <tr>
                 <td className="px-4 py-3 text-sm text-gray-900">
-                  {invoice.subscription
+                  {invoice.subscriptionType
+                    ? `اشتراك: ${invoice.subscriptionType}`
+                    : invoice.subscription
                     ? `اشتراك: ${invoice.subscription.package.nameAr}`
                     : "مبلغ الفاتورة"}
                 </td>
@@ -427,24 +430,22 @@ export default function InvoiceDetailPage() {
                   </td>
                 </tr>
               )}
-              {invoice.taxAmount > 0 && (
-                <tr>
-                  <td className="px-4 py-3 text-sm text-gray-900">الضريبة</td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    +{invoice.taxAmount.toFixed(2)} ريال
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
 
         {/* Total */}
         <div className="mb-8 border-t pt-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-xl font-semibold text-gray-900">الإجمالي:</span>
             <span className="text-3xl font-bold text-pink-600">{invoice.total.toFixed(2)} ريال</span>
           </div>
+          {invoice.taxAmount > 0 && (
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <span>الضريبة:</span>
+              <span>{invoice.taxAmount.toFixed(2)} ريال</span>
+            </div>
+          )}
           {remaining > 0 && (
             <div className="mt-4 flex items-center justify-between">
               <span className="text-lg font-medium text-gray-700">المتبقي:</span>

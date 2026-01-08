@@ -46,6 +46,14 @@ export default function SubscriptionsPage() {
     frozenDays: "",
     frozenEndDate: "",
   })
+  const [extendModal, setExtendModal] = useState<{
+    open: boolean
+    subscription: Subscription | null
+  }>({ open: false, subscription: null })
+  const [extendForm, setExtendForm] = useState({
+    additionalDays: "",
+    reason: "",
+  })
   const [processing, setProcessing] = useState(false)
   const [deletingSubscription, setDeletingSubscription] = useState<string | null>(null)
   const frozenEndDateInputRef = useRef<HTMLInputElement>(null)
@@ -162,6 +170,44 @@ export default function SubscriptionsPage() {
     } catch (error) {
       console.error("Error unfreezing subscription:", error)
       alert("حدث خطأ أثناء إلغاء تجميد الاشتراك")
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  const handleExtend = async () => {
+    if (!extendModal.subscription) return
+
+    if (!extendForm.additionalDays || parseInt(extendForm.additionalDays) <= 0) {
+      alert("يجب إدخال عدد الأيام المراد إضافتها (أكبر من صفر)")
+      return
+    }
+
+    setProcessing(true)
+    try {
+      const res = await fetch(`/api/subscriptions/${extendModal.subscription.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "extend",
+          additionalDays: parseInt(extendForm.additionalDays),
+          reason: extendForm.reason || undefined,
+        }),
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        alert(error.error || "حدث خطأ أثناء إضافة المدة")
+        return
+      }
+
+      setExtendModal({ open: false, subscription: null })
+      setExtendForm({ additionalDays: "", reason: "" })
+      fetchSubscriptions()
+      alert("تم إضافة المدة بنجاح")
+    } catch (error) {
+      console.error("Error extending subscription:", error)
+      alert("حدث خطأ أثناء إضافة المدة")
     } finally {
       setProcessing(false)
     }
@@ -348,6 +394,16 @@ export default function SubscriptionsPage() {
                             إلغاء تجميد
                           </button>
                         )}
+                        {hasPermission(userRole, PERMISSIONS.SUBSCRIPTIONS_EXTEND) && (
+                          <button
+                            onClick={() => setExtendModal({ open: true, subscription })}
+                            className="flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium"
+                            disabled={processing}
+                          >
+                            <Calendar className="h-4 w-4" />
+                            إضافة مدة
+                          </button>
+                        )}
                         {hasPermission(userRole, PERMISSIONS.SUBSCRIPTIONS_CANCEL) && (
                           <button
                             onClick={() => handleDeleteSubscription(subscription.id, subscription.client.name, subscription.package.nameAr)}
@@ -500,6 +556,98 @@ export default function SubscriptionsPage() {
                 className="rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3 font-medium text-white transition-colors hover:from-blue-600 hover:to-blue-700 disabled:opacity-50"
               >
                 {processing ? "جاري التجميد..." : "تجميد الاشتراك"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Extend Modal */}
+      {extendModal.open && extendModal.subscription && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl rounded-lg bg-white p-8 shadow-xl">
+            <h2 className="mb-6 text-2xl font-bold text-gray-900">
+              إضافة مدة للاشتراك
+            </h2>
+            <div className="mb-4 rounded-lg bg-gray-50 p-4">
+              <p className="text-sm text-gray-600">العضو:</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {extendModal.subscription.client.name}
+              </p>
+              <p className="mt-2 text-sm text-gray-600">الباقة:</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {extendModal.subscription.package.nameAr}
+              </p>
+              <p className="mt-2 text-sm text-gray-600">تاريخ انتهاء الحالي:</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {format(new Date(extendModal.subscription.endDate), "yyyy-MM-dd", { locale: ar })}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  عدد الأيام المراد إضافتها <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={extendForm.additionalDays}
+                  onChange={(e) =>
+                    setExtendForm({ ...extendForm, additionalDays: e.target.value })
+                  }
+                  placeholder="مثال: 30"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-pink-500 focus:ring-pink-500"
+                />
+                {extendForm.additionalDays && parseInt(extendForm.additionalDays) > 0 && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    التاريخ الجديد:{" "}
+                    {format(
+                      new Date(
+                        new Date(extendModal.subscription.endDate).getTime() +
+                          parseInt(extendForm.additionalDays) * 24 * 60 * 60 * 1000
+                      ),
+                      "yyyy-MM-dd",
+                      { locale: ar }
+                    )}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  السبب (اختياري)
+                </label>
+                <textarea
+                  value={extendForm.reason}
+                  onChange={(e) =>
+                    setExtendForm({ ...extendForm, reason: e.target.value })
+                  }
+                  rows={3}
+                  placeholder="مثال: تعويض عن أيام التجميد"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-pink-500 focus:ring-pink-500"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setExtendModal({ open: false, subscription: null })
+                  setExtendForm({ additionalDays: "", reason: "" })
+                }}
+                className="flex-1 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={handleExtend}
+                disabled={processing || !extendForm.additionalDays || parseInt(extendForm.additionalDays) <= 0}
+                className="flex-1 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-medium text-white transition-colors hover:from-pink-600 hover:to-purple-700 disabled:opacity-50"
+              >
+                {processing ? "جاري المعالجة..." : "إضافة المدة"}
               </button>
             </div>
           </div>

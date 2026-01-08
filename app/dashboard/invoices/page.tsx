@@ -139,7 +139,7 @@ export default function InvoicesPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="بحث عن فاتورة (رقم الفاتورة، اسم العميلة، رقم العضوية)..."
+            placeholder="بحث عن فاتورة (رقم الفاتورة، اسم العضو، رقم العضوية)..."
             className="w-full rounded-lg border border-gray-300 bg-white py-3 pr-12 pl-4 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-pink-500 focus:ring-pink-500"
           />
         </div>
@@ -177,7 +177,7 @@ export default function InvoicesPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">رقم الفاتورة</th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">العميلة</th>
+                <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">العضوية</th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">المبلغ</th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">الحالة</th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">التاريخ</th>

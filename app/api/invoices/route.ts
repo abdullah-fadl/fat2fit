@@ -48,6 +48,16 @@ export async function POST(req: NextRequest) {
     
     const total = amountAfterDiscount // الإجمالي هو نفس المبلغ (يحتوي على الضريبة)
 
+    // الحصول على نوع الاشتراك (الباقة) إذا كان هناك اشتراك
+    let subscriptionType: string | null = null
+    if (subscriptionId) {
+      const subscription = await prisma.subscription.findUnique({
+        where: { id: subscriptionId },
+        include: { package: true },
+      })
+      subscriptionType = subscription?.package?.nameAr || subscription?.package?.name || null
+    }
+
     const invoice = await prisma.invoice.create({
       data: {
         invoiceNumber,
@@ -61,6 +71,7 @@ export async function POST(req: NextRequest) {
         status: "PENDING",
         notes: notes || null,
         couponCode: couponCode || null,
+        subscriptionType,
       },
       include: {
         client: {

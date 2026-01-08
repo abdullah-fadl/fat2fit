@@ -10,6 +10,7 @@ import { ArrowRight, Save, Calendar } from "lucide-react"
 const clientSchema = z.object({
   name: z.string().min(2, "الاسم يجب أن يكون أكثر من حرفين"),
   phone: z.string().min(10, "رقم الجوال غير صحيح"),
+  idNumber: z.string().min(10, "رقم الهوية يجب أن يكون 10 أرقام على الأقل").optional().or(z.literal("")),
   email: z.string().email("البريد الإلكتروني غير صحيح").optional().or(z.literal("")),
   dateOfBirth: z.string().optional(),
   height: z.string().optional(),
@@ -54,7 +55,7 @@ export default function NewClientPage() {
       const client = await response.json()
       router.push(`/dashboard/clients/${client.id}`)
     } catch (err: any) {
-      setError(err.message || "حدث خطأ أثناء إنشاء العميلة")
+      setError(err.message || "حدث خطأ أثناء إنشاء العضوية")
     } finally {
       setLoading(false)
     }
@@ -70,8 +71,8 @@ export default function NewClientPage() {
           <ArrowRight className="h-5 w-5" />
           العودة
         </button>
-        <h1 className="text-3xl font-bold text-gray-900">تسجيل عميلة جديدة</h1>
-        <p className="mt-2 text-gray-600">أدخل بيانات العميلة الجديدة</p>
+        <h1 className="text-3xl font-bold text-gray-900">إنشاء عضوية جديدة</h1>
+        <p className="mt-2 text-gray-600">أدخل بيانات العضو/العضوة الجديدة</p>
       </div>
 
       <div className="mx-auto max-w-3xl rounded-lg bg-white p-8 shadow">
@@ -112,6 +113,22 @@ export default function NewClientPage() {
                 />
                 {errors.phone && (
                   <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  رقم الهوية <span className="text-red-500">*</span>
+                </label>
+                <input
+                  {...register("idNumber")}
+                  type="text"
+                  placeholder="10 أرقام"
+                  maxLength={10}
+                  className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-pink-500 focus:ring-pink-500"
+                />
+                {errors.idNumber && (
+                  <p className="mt-1 text-sm text-red-600">{errors.idNumber.message}</p>
                 )}
               </div>
 
@@ -242,7 +259,7 @@ export default function NewClientPage() {
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-medium text-white transition-colors hover:from-pink-600 hover:to-purple-700 disabled:opacity-50"
             >
               <Save className="h-5 w-5" />
-              {loading ? "جاري الحفظ..." : "حفظ العميلة"}
+              {loading ? "جاري الحفظ..." : "حفظ العضوية"}
             </button>
           </div>
         </form>

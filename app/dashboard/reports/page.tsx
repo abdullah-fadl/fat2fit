@@ -228,7 +228,7 @@ export default function ReportsPage() {
           <div className="rounded-lg bg-white p-6 shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">إجمالي العميلات</p>
+                <p className="text-sm text-gray-600">إجمالي العضويات</p>
                 <p className="mt-2 text-3xl font-bold text-gray-900">{stats.totalClients}</p>
               </div>
               <div className="rounded-full bg-pink-100 p-4">
@@ -241,7 +241,7 @@ export default function ReportsPage() {
           <div className="rounded-lg bg-white p-6 shadow">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">العميلات النشطات</p>
+                <p className="text-sm text-gray-600">الأعضاء النشطين</p>
                 <p className="mt-2 text-3xl font-bold text-green-600">{stats.activeClients}</p>
               </div>
               <div className="rounded-full bg-green-100 p-4">
@@ -306,6 +306,43 @@ export default function ReportsPage() {
         </div>
       )}
 
+      {/* Reports Navigation */}
+      <div className="mt-8 rounded-lg bg-white p-6 shadow">
+        <h2 className="mb-4 text-xl font-semibold text-gray-900">التقارير التفصيلية</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <a
+            href="/dashboard/reports/financial"
+            className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+          >
+            <TrendingUp className="h-6 w-6 text-purple-600" />
+            <div>
+              <div className="font-medium text-gray-900">التقرير المالي</div>
+              <div className="text-sm text-gray-600">تقرير مالي مفصل مع البحث بالمدة</div>
+            </div>
+          </a>
+          <a
+            href="/dashboard/reports/sales"
+            className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+          >
+            <Users className="h-6 w-6 text-green-600" />
+            <div>
+              <div className="font-medium text-gray-900">تقرير المبيعات</div>
+              <div className="text-sm text-gray-600">أعضاء جدد وتجديدات</div>
+            </div>
+          </a>
+          <a
+            href="/dashboard/reports/members"
+            className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 transition-colors hover:bg-gray-50"
+          >
+            <Users className="h-6 w-6 text-blue-600" />
+            <div>
+              <div className="font-medium text-gray-900">تقرير الأعضاء</div>
+              <div className="text-sm text-gray-600">نوع، مدة، وحالة الاشتراك</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
       {/* Additional Info */}
       <div className="mt-8 rounded-lg bg-blue-50 p-6">
         <h2 className="mb-4 text-xl font-semibold text-gray-900">ملاحظات</h2>
@@ -313,6 +350,7 @@ export default function ReportsPage() {
           <li>الإحصائيات يتم تحديثها تلقائياً</li>
           <li>يمكنك تغيير الفترة الزمنية لعرض البيانات</li>
           <li>الإيرادات تشمل جميع المدفوعات في الفترة المحددة</li>
+          <li>استخدم التقارير التفصيلية للحصول على معلومات أكثر</li>
         </ul>
       </div>
     </div>

@@ -257,7 +257,7 @@ export default function NewInvoicePage() {
           العودة
         </button>
         <h1 className="text-3xl font-bold text-gray-900">فاتورة جديدة</h1>
-        <p className="mt-2 text-gray-600">إنشاء فاتورة جديدة للعميلة</p>
+        <p className="mt-2 text-gray-600">إنشاء فاتورة جديدة للعضوية</p>
       </div>
 
       <div className="mx-auto max-w-3xl rounded-lg bg-white p-8 shadow">
@@ -271,7 +271,7 @@ export default function NewInvoicePage() {
           {/* Client Selection */}
           <div className="relative" ref={clientSearchRef}>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              العميلة <span className="text-red-500">*</span>
+              العضوية <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <div className="relative">
@@ -294,7 +294,7 @@ export default function NewInvoicePage() {
                     }
                   }}
                   onFocus={() => setIsClientDropdownOpen(true)}
-                  placeholder="ابحث عن عميلة (الاسم، رقم العضوية، رقم الجوال)..."
+                  placeholder="ابحث عن عضو (الاسم، رقم العضوية، رقم الجوال)..."
                   className="block w-full rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-4 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-pink-500 focus:ring-pink-500"
                   required={!formData.clientId}
                 />

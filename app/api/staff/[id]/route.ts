@@ -24,20 +24,6 @@ export async function GET(
     const resolvedParams = await Promise.resolve(params)
     const staff = await prisma.user.findUnique({
       where: { id: resolvedParams.id },
-      include: {
-        // staffSchedules not in schema
-        // staffSchedules: {
-        //   orderBy: { dayOfWeek: "asc" },
-        // },
-        // classes: true, // Class model not in schema
-        _count: {
-          select: {
-            // bookings and classes models not in schema
-            // bookings: true,
-            // classes: true,
-          },
-        },
-      },
     })
 
     if (!staff) {
@@ -47,10 +33,10 @@ export async function GET(
     // Don't return password
     const { password, ...staffWithoutPassword } = staff
     return NextResponse.json(staffWithoutPassword)
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching staff:", error)
     return NextResponse.json(
-      { error: "حدث خطأ أثناء جلب البيانات" },
+      { error: error.message || "حدث خطأ أثناء جلب البيانات" },
       { status: 500 }
     )
   }
@@ -79,11 +65,7 @@ export async function PUT(
       phone,
       password,
       role,
-      specialization,
-      hourlyRate,
-      bio,
       isActive,
-      schedules,
     } = body
 
     const oldUser = await prisma.user.findUnique({
@@ -94,15 +76,12 @@ export async function PUT(
       return NextResponse.json({ error: "الموظف غير موجود" }, { status: 404 })
     }
 
-    // Prepare update data
+    // Prepare update data (only fields that exist in schema)
     const updateData: any = {
       name,
       email: email || null,
       phone: phone || null,
       role,
-      specialization: specialization || null,
-      hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
-      bio: bio || null,
       isActive: isActive !== undefined ? isActive : oldUser.isActive,
     }
 

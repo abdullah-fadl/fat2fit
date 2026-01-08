@@ -111,8 +111,8 @@ export default function ClientsPage() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">العميلات</h1>
-          <p className="mt-2 text-gray-600">عرض وإدارة جميع العميلات</p>
+          <h1 className="text-3xl font-bold text-gray-900">العضوية</h1>
+          <p className="mt-2 text-gray-600">عرض وإدارة جميع الأعضاء</p>
         </div>
         {hasPermission(userRole, PERMISSIONS.CLIENTS_CREATE) && (
           <Link
@@ -120,7 +120,7 @@ export default function ClientsPage() {
             className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-medium text-white transition-colors hover:from-pink-600 hover:to-purple-700"
           >
             <UserPlus className="h-5 w-5" />
-            عميلة جديدة
+            إنشاء عضوية جديدة
           </Link>
         )}
       </div>
